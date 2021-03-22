@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("../services/jwt")
 const User = require("../models/user");
+const user = require("../models/user");
 
 function signUp(req, res){
 
@@ -82,6 +83,32 @@ function signIn(req, res){
 
 }
 
+function getUsers(req,res){
+    user.find().then(users => {
+        if (!users){
+            res.status(404).send({message: "No se encontrado ningún usuarios"})
+        }else{
+            res.status(200).send({users});
+        }
+    })
+
+}
+
+function getUsersActive(req,res){
+
+    //console.log(req);
+    const query=req.query;
+
+    user.find({ active:query.active }).then(users => {
+        if (!users){
+            res.status(404).send({message: "No se encontrado ningún usuarios"})
+        }else{
+            res.status(200).send({users});
+        }
+    })
+
+}
+
 module.exports = {
-    signUp, signIn
+    signUp, signIn, getUsers, getUsersActive
 };
