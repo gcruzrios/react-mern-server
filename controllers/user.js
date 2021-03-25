@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("../services/jwt")
 const User = require("../models/user");
-const user = require("../models/user");
+//const user = require("../models/user");
 const fs = require("fs");
 const path = require("path");
 
@@ -86,7 +86,7 @@ function signIn(req, res){
 }
 
 function getUsers(req,res){
-    user.find().then(users => {
+    User.find().then(users => {
         if (!users){
             res.status(404).send({message: "No se encontrado ningún usuarios"})
         }else{
@@ -101,7 +101,7 @@ function getUsersActive(req,res){
     //console.log(req);
     const query=req.query;
 
-    user.find({ active:query.active }).then(users => {
+    User.find({ active:query.active }).then(users => {
         if (!users){
             res.status(404).send({message: "No se encontrado ningún usuarios"})
         }else{
@@ -171,9 +171,84 @@ function getAvatar(req,res){
             res.sendFile(path.resolve(filePath));
         }
     })
-    console.log("Get avatar...");
+    //console.log("Get avatar...");
 
 }
+
+async function updateUser(req, res){
+    
+    let userData = req.body;
+    userData.email = req.body.email.toLowerCase();
+
+    //console.log(userData);
+    const params = req.params;
+
+    if(userData.password){
+        await bcrypt.hash(userData.password, null, null, (err,hash)=>{
+            if(err){
+               res.status(500).send({message:"Error al encriptar la contraseña"}) 
+            }else{
+                userData.password = hash;
+            }
+        });
+    };
+
+    User.findByIdAndUpdate({_id:params.id},userData, (err, userUpdate) =>{
+        if(err){
+            res.status(500).send({message:"Error del servidor."});
+        }else{
+            if (!userUpdate){
+                res.status(404).send({message:"Usuario no encontrado"});
+            }else{
+                res.status(200).send({message: "Usuario actualizado correctamente"})
+            }
+        }
+    })
+
+}
+
+function activateUser(req,res){
+   //console.log("Activando usuario");
+    const {id} = req.params;
+    const { active } = req.body;
+
+    //console.log(id);
+    //console.log(active);
+
+    User.findByIdAndUpdate(id, { active }, (err,userStored)=>{
+        if(err){
+            res.status(500).send({message:"Error del servidor."})
+        }else{
+            if (!userStored){
+                res.status(404).send({message:"Error, usuario no encontrado."})
+            }else{
+                if(active===true){
+                    res.status(200).send({message:"Usuario activado correctamente."})
+                }else{
+                    res.status(200).send({message:"Usuario desactivado correctamente."})
+                }
+            }
+        }
+    })
+
+}
+
+function deleteUser(req,res){
+   const { id } = req.params;
+
+   User.findByIdAndRemove(id, (err,userDeleted)=>{
+        if(err){
+            res.status(500).send({message:"Error del servidor."})
+        }else{
+            if (!userDeleted){
+                res.status(404).send({message:"Error, usuario no encontrado."})
+            }else{
+                res.status(200).send({message:"Usuario ha sido eliminado correctamente."})
+            }
+        }
+   })
+}
+
 module.exports = {
-    signUp, signIn, getUsers, getUsersActive, uploadAvatar, getAvatar
+    signUp, signIn, getUsers, getUsersActive, uploadAvatar, getAvatar, updateUser, activateUser, deleteUser
 };
