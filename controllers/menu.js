@@ -52,7 +52,7 @@ function updateMenu(req, res){
             if(!MenuUpdated){
                 res.status(404).send({message:"Menú no encontrado"});
             }else{
-                res.status(200).send({message: "Menú actualizado correctamente"})
+                res.status(200).send({message: "Menu actualizado correctamente"})
             }
         }
         
