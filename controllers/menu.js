@@ -64,7 +64,7 @@ function activateMenu(req, res){
     const { id } = req.params;
     const { active } = req.body;
 
-    Menu.findByIdAndUpdate(id, active, (err, MenuUpdated)=>{
+    Menu.findByIdAndUpdate(id, { active }, (err, MenuUpdated)=>{
 
         if(err){
             res.status(500).send({ message: "Error del servidor"});
