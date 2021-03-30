@@ -5,6 +5,8 @@ function addCourse(req, res) {
   const course = new Course(body);
   course.order = 1000;
 
+  //console.log(course);
+
   course.save((err, courseStored) => {
     if (err) {
       res
@@ -47,14 +49,14 @@ function deleteCourse(req, res) {
 
   Course.findByIdAndRemove(id, (err, courseDeleted) => {
     if (err) {
-      res.status(500).send({ code: 500, message: "Erro del servidor." });
+      res.status(500).send({ code: 500, message: "Error del servidor." });
     } else {
       if (!courseDeleted) {
         res.status(404).send({ code: 404, message: "Curso no encontrado." });
       } else {
         res.status(200).send({
           code: 200,
-          message: "El curso ha sido elinado correctamente."
+          message: "El curso ha sido eliminado correctamente."
         });
       }
     }
