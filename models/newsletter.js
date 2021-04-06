@@ -10,3 +10,5 @@ const NewsletterSchema = Schema (
     });
     
 module.exports = mongoose.model("Newsletter", NewsletterSchema);
+
+// Modelo Email
